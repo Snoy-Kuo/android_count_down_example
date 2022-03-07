@@ -2,6 +2,7 @@ package com.snoy.count_down_example.ui.main
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,9 @@ import com.snoy.count_down_example.R
 import com.snoy.count_down_example.databinding.MainFragmentBinding
 import com.snoy.count_down_example.model.repo.FakeAuthRepo
 import com.snoy.count_down_example.ui.ViewModelFactory
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
@@ -30,7 +33,7 @@ class MainFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private var disposable: Disposable? = null
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     private lateinit var viewModel: MainViewModel
 
@@ -45,13 +48,20 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        disposable?.dispose()
+        disposables.clear()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val factory = ViewModelFactory(FakeAuthRepo())
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
+
+        binding.swResp.isChecked = true
+        binding.swResp.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("RDTest", "isChecked= $isChecked")
+            viewModel.setResp(isChecked)
+        }
+
         binding.btnGetOTP.setOnClickListener { onClickGetOTP() }
 
         binding.btnGetOTP2.setOnClickListener { onClickGetOTP2() }
@@ -76,12 +86,21 @@ class MainFragment : Fragment() {
             }
         }
         binding.btnGetOTP5.setOnClickListener { viewModel.getSmsOTP5(COUNTDOWN_SECS) }
+
+        val disposable = viewModel.getSmsOtp6State
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { state ->
+                updateButton(binding.btnGetOTP6, getString(R.string.get_sms_otp6), state)
+            }
+        disposables.add(disposable)
+        binding.btnGetOTP6.setOnClickListener { viewModel.getSmsOTP6(COUNTDOWN_SECS) }
     }
 
     @Suppress("SameParameterValue")
     @SuppressLint("SetTextI18n")
-    private fun updateButton(button: Button, funName: String, states: GetSmsOtpState) {
-        when (states) {
+    private fun updateButton(button: Button, funName: String, state: GetSmsOtpState) {
+        when (state) {
             is GetSmsOtpState.GetSmsOtpInitial -> {
                 binding.progress.visibility = View.INVISIBLE
                 button.isEnabled = true
@@ -91,7 +110,7 @@ class MainFragment : Fragment() {
                 binding.progress.visibility = View.INVISIBLE
                 button.isEnabled = true
                 button.text = funName
-                Toast.makeText(requireContext(), "$funName ${states.msg}!", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), "$funName ${state.msg}!", Toast.LENGTH_SHORT)
                     .show()
             }
             is GetSmsOtpState.GetSmsOtpLoading -> {
@@ -101,7 +120,7 @@ class MainFragment : Fragment() {
             is GetSmsOtpState.GetSmsOtpWaiting -> {
                 binding.progress.visibility = View.INVISIBLE
                 button.isEnabled = false
-                button.text = "$funName (Wait ${states.secs} secs)"
+                button.text = "$funName (Wait ${state.secs} secs)"
             }
             is GetSmsOtpState.GetSmsOtpSuccess -> {
                 binding.progress.visibility = View.INVISIBLE
@@ -140,7 +159,7 @@ class MainFragment : Fragment() {
         binding.btnGetOTP.isEnabled = false
 
         val countdownSec = COUNTDOWN_SECS
-        disposable = viewModel.getSmsOTP(countdownSec)
+        val disposable = viewModel.getSmsOTP(countdownSec)
             .subscribe {
                 binding.progress.visibility = View.INVISIBLE
                 val secs = countdownSec - it
@@ -151,6 +170,7 @@ class MainFragment : Fragment() {
                     countdownSec
                 )
             }
+        disposables.add(disposable)
     }
 
     private fun onClickGetOTP2() {

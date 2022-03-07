@@ -5,11 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.snoy.count_down_example.model.repo.AuthRepo
+import com.snoy.count_down_example.model.repo.FakeAuthRepo
 import com.snoy.count_down_example.utils.tickerFlow
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -29,6 +31,10 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
 
     val getSmsOtp5State: MutableStateFlow<GetSmsOtpState> by lazy {
         MutableStateFlow(GetSmsOtpState.GetSmsOtpInitial)
+    }
+
+    val getSmsOtp6State: BehaviorSubject<GetSmsOtpState> by lazy {
+        BehaviorSubject.createDefault(GetSmsOtpState.GetSmsOtpInitial)
     }
 
     //RxJava
@@ -161,6 +167,35 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
                 .flowOn(Dispatchers.IO) // Works upstream, doesn't change downstream
                 .flowOn(Dispatchers.Main)
                 .collect()
+        }
+    }
+
+    //RxJava to BehaviorSubject
+    fun getSmsOTP6(countdownSecs: Long) {
+        getSmsOtp6State.onNext(GetSmsOtpState.GetSmsOtpLoading)
+        val disposable = repo.getSmsOtp()
+            .doOnNext { success ->
+                if (success) {
+                    getSmsOtp6State.onNext(GetSmsOtpState.GetSmsOtpSuccess)
+                    getSmsOtpDelay(countdownSecs)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { secs ->
+                            getSmsOtp6State.onNext(secsToSmsOtpState(countdownSecs - secs))
+                        }
+                } else {
+                    getSmsOtp6State.onNext(GetSmsOtpState.GetSmsOtpFail("FAIL"))
+                }
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
+        disposables.add(disposable)
+    }
+
+    fun setResp(success:Boolean) {
+        if (repo is FakeAuthRepo) {
+            repo.setResp(success)
         }
     }
 }

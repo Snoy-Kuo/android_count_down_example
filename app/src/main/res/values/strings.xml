@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">count_down_example</string>
-    <string name="get_sms_otp1">Get SMS OTP\n(RxJava)</string>
+    <string name="get_sms_otp1">Get SMS OTP\n(Flowable)</string>
     <string name="get_sms_otp2">Get SMS OTP2\n(Flow)</string>
-    <string name="get_sms_otp3">Get SMS OTP3\n(RxJava+LiveData)</string>
+    <string name="get_sms_otp3">Get SMS OTP3\n(Flowable+LiveData)</string>
     <string name="get_sms_otp4">Get SMS OTP4\n(Flow+LiveData)</string>
     <string name="get_sms_otp5">Get SMS OTP5\n(Flow+StateFlow)</string>
+    <string name="get_sms_otp6">Get SMS OTP6\n(Flowable+BehaviorSubject)</string>
 </resources>

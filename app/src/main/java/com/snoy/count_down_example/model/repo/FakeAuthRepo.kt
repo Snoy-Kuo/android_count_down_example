@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 class FakeAuthRepo : AuthRepo {
 
     companion object {
-        const val GET_OTP_RESP: Boolean = true
+        var GET_OTP_RESP: Boolean = true
     }
 
     override fun getSmsOtp(): Flowable<Boolean> {
@@ -22,5 +22,9 @@ class FakeAuthRepo : AuthRepo {
             delay(2000L)
             emit(GET_OTP_RESP)
         }
+    }
+
+    fun setResp(success:Boolean){
+        GET_OTP_RESP = success
     }
 }

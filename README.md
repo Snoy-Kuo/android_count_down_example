@@ -28,6 +28,7 @@ An Android example App that simulates "get SMS OTP" flow:
  - [Sealed interfaces in Kotlin](https://jorgecastillo.dev/sealed-interfaces-kotlin)
  - [Kotlin flows on Android](https://developer.android.com/kotlin/flow)
  - [StateFlow and SharedFlow](https://developer.android.com/kotlin/flow/stateflow-and-sharedflow)
+ - [Class BehaviorSubject<T>](http://reactivex.io/RxJava/3.x/javadoc/io/reactivex/rxjava3/subjects/BehaviorSubject.html)
 
  ## Libraries
 
@@ -40,4 +41,4 @@ An Android example App that simulates "get SMS OTP" flow:
 
  ## Todos
 
- - update UI by RxJava BehaviorSubject.
+ - update UI by Compose State.

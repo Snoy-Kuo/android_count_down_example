@@ -7,16 +7,27 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.MainFragment">
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swResp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textOff="Fail"
+        android:textOn="Success"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
+
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/btnGetOTP"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toBottomOf="@+id/swResp" />
 
     <Button
         android:id="@+id/btnGetOTP"
@@ -25,11 +36,9 @@
         android:layout_marginTop="20dp"
         android:text="@string/get_sms_otp1"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@+id/btnGetOTP2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progress"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="HardcodedText" />
 
     <Button
@@ -39,11 +48,9 @@
         android:layout_marginTop="20dp"
         android:text="@string/get_sms_otp2"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@+id/btnGetOTP3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGetOTP"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="HardcodedText" />
 
     <Button
@@ -53,11 +60,9 @@
         android:layout_marginTop="20dp"
         android:text="@string/get_sms_otp3"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@+id/btnGetOTP4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGetOTP2"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="HardcodedText" />
 
     <Button
@@ -71,7 +76,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGetOTP3"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="HardcodedText" />
 
     <Button
@@ -81,11 +85,21 @@
         android:layout_marginTop="20dp"
         android:text="@string/get_sms_otp5"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGetOTP4"
-        app:layout_constraintVertical_chainStyle="packed"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/btnGetOTP6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/get_sms_otp6"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnGetOTP5"
         tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
