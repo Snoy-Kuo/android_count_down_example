@@ -3,6 +3,7 @@ package com.snoy.count_down_example.ui.main
 import android.os.CountDownTimer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.snoy.count_down_example.model.repo.AuthRepo
 import com.snoy.count_down_example.utils.tickerFlow
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class MainViewModel(private val repo: AuthRepo) : ViewModel() {
@@ -22,6 +24,9 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
     private val disposables: CompositeDisposable = CompositeDisposable()
 
     val getSmsOtp3State: MutableLiveData<GetSmsOtpState> by lazy {
+        MutableLiveData(GetSmsOtpState.GetSmsOtpInitial)
+    }
+    val getSmsOtp4State: MutableLiveData<GetSmsOtpState> by lazy {
         MutableLiveData(GetSmsOtpState.GetSmsOtpInitial)
     }
 
@@ -112,6 +117,27 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
             else -> {
                 GetSmsOtpState.GetSmsOtpWaiting(secs)
             }
+        }
+    }
+
+    //Flow to LiveData
+    fun getSmsOTP4(countdownSecs: Long) {
+        getSmsOtp4State.value = GetSmsOtpState.GetSmsOtpLoading
+
+        viewModelScope.launch {
+            repo.getSmsOtp2()
+                .flowOn(Dispatchers.IO) // Works upstream, doesn't change downstream
+                .flowOn(Dispatchers.Main)
+                .collect { success ->
+                    return@collect if (success) {
+                        getSmsOtp4State.value = GetSmsOtpState.GetSmsOtpSuccess
+                        getSmsOtpDelay3(countdownSecs, callback = { secs ->
+                            getSmsOtp4State.value = secsToSmsOtpState(secs)
+                        })
+                    } else {
+                        getSmsOtp4State.value = GetSmsOtpState.GetSmsOtpFail("FAIL")
+                    }
+                }
         }
     }
 }

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.snoy.count_down_example.R
 import com.snoy.count_down_example.databinding.MainFragmentBinding
 import com.snoy.count_down_example.model.repo.FakeAuthRepo
 import com.snoy.count_down_example.ui.ViewModelFactory
@@ -50,11 +51,18 @@ class MainFragment : Fragment() {
         val factory = ViewModelFactory(FakeAuthRepo())
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         binding.btnGetOTP.setOnClickListener { onClickGetOTP() }
+
         binding.btnGetOTP2.setOnClickListener { onClickGetOTP2() }
+
         viewModel.getSmsOtp3State.observe(viewLifecycleOwner) { state ->
-            updateButton(binding.btnGetOTP3, "Get SMS OTP3", state)
+            updateButton(binding.btnGetOTP3, getString(R.string.get_sms_otp3), state)
         }
-        binding.btnGetOTP3.setOnClickListener { onClickGetOTP3() }
+        binding.btnGetOTP3.setOnClickListener { viewModel.getSmsOTP3(COUNTDOWN_SECS) }
+
+        viewModel.getSmsOtp4State.observe(viewLifecycleOwner) { state ->
+            updateButton(binding.btnGetOTP4, getString(R.string.get_sms_otp4), state)
+        }
+        binding.btnGetOTP4.setOnClickListener { viewModel.getSmsOTP4(COUNTDOWN_SECS) }
     }
 
     @Suppress("SameParameterValue")
@@ -123,7 +131,12 @@ class MainFragment : Fragment() {
             .subscribe {
                 binding.progress.visibility = View.INVISIBLE
                 val secs = countdownSec - it
-                updateButton(binding.btnGetOTP, "Get SMS OTP", secs, countdownSec)
+                updateButton(
+                    binding.btnGetOTP,
+                    getString(R.string.get_sms_otp1),
+                    secs,
+                    countdownSec
+                )
             }
     }
 
@@ -137,12 +150,13 @@ class MainFragment : Fragment() {
                 .collect {
                     binding.progress.visibility = View.INVISIBLE
                     val secs = it
-                    updateButton(binding.btnGetOTP2, "Get SMS OTP2", secs, countdownSec)
+                    updateButton(
+                        binding.btnGetOTP2,
+                        getString(R.string.get_sms_otp2),
+                        secs,
+                        countdownSec
+                    )
                 }
         }
-    }
-
-    private fun onClickGetOTP3() {
-        viewModel.getSmsOTP3(COUNTDOWN_SECS)
     }
 }

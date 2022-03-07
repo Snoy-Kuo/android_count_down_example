@@ -22,9 +22,11 @@ An Android example App that simulates "get SMS OTP" flow:
  - [Day 7 ViewModel (Last) 應用與心得總結](https://ithelp.ithome.com.tw/articles/10218512)
  - [View Binding](https://developer.android.com/topic/libraries/view-binding)
  - [How to create a countdown with flow coroutines](https://stackoverflow.com/a/70019091)
+ - [LiveData Overview](https://developer.android.com/topic/libraries/architecture/livedata)
  - [CountDownTimer](https://developer.android.com/reference/android/os/CountDownTimer)
  - [RxJava2 and LiveData](https://ithelp.ithome.com.tw/articles/10197420)
  - [Sealed interfaces in Kotlin](https://jorgecastillo.dev/sealed-interfaces-kotlin)
+ - [Kotlin flows on Android](https://developer.android.com/kotlin/flow)
 
 
  ## Libraries
@@ -33,8 +35,9 @@ An Android example App that simulates "get SMS OTP" flow:
  - [rxandroid](https://github.com/ReactiveX/RxAndroid)
  - [kotlinx-coroutines-android](https://developer.android.com/kotlin/coroutines)
  - [lifecycle-runtime-ktx](https://developer.android.com/jetpack/androidx/releases/lifecycle)
+ - [lifecycle-viewmodel-ktx](https://developer.android.com/jetpack/androidx/releases/lifecycle)
 
 
  ## Todos
 
- - update LiveData value from Coroutines Flow.
+ - update UI by Coroutines StateFlow.
