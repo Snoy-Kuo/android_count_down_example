@@ -4,7 +4,7 @@ An Android example App that simulates "get SMS OTP" flow:
  - click the "get SMS OTP" button
  - disable the button and show progressbar while waiting for response
  - count down form 10 to 0
- - the button can click again
+ - the button can be clicked again
 
 ## Dev env
 
@@ -21,12 +21,15 @@ An Android example App that simulates "get SMS OTP" flow:
  - [RxJava2系列实践之倒计时功能(三)](https://www.jianshu.com/p/44c6503c2f11)
  - [Day 7 ViewModel (Last) 應用與心得總結](https://ithelp.ithome.com.tw/articles/10218512)
  - [View Binding](https://developer.android.com/topic/libraries/view-binding)
+ - [How to create a countdown with flow coroutines](https://stackoverflow.com/a/70019091)
 
  ## Libraries
 
  - [rxjava](https://github.com/ReactiveX/RxJava)
  - [rxandroid](https://github.com/ReactiveX/RxAndroid)
+ - [kotlinx-coroutines-android](https://developer.android.com/kotlin/coroutines)
+ - [lifecycle-runtime-ktx](https://developer.android.com/jetpack/androidx/releases/lifecycle)
 
  ## Todos
 
- - add coroutine Flow solution.
+ - add LiveData objects in ViewModel.
