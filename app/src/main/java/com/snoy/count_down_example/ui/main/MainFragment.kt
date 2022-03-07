@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +20,7 @@ class MainFragment : Fragment() {
 
     companion object {
         fun newInstance() = MainFragment()
+        private const val COUNTDOWN_SECS = 10L
     }
 
     private var _binding: MainFragmentBinding? = null
@@ -49,74 +51,98 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         binding.btnGetOTP.setOnClickListener { onClickGetOTP() }
         binding.btnGetOTP2.setOnClickListener { onClickGetOTP2() }
+        viewModel.getSmsOtp3State.observe(viewLifecycleOwner) { state ->
+            updateButton(binding.btnGetOTP3, "Get SMS OTP3", state)
+        }
+        binding.btnGetOTP3.setOnClickListener { onClickGetOTP3() }
     }
 
+    @Suppress("SameParameterValue")
     @SuppressLint("SetTextI18n")
+    private fun updateButton(button: Button, funName: String, states: GetSmsOtpState) {
+        when (states) {
+            is GetSmsOtpState.GetSmsOtpInitial -> {
+                binding.progress.visibility = View.INVISIBLE
+                button.isEnabled = true
+                button.text = funName
+            }
+            is GetSmsOtpState.GetSmsOtpFail -> {
+                binding.progress.visibility = View.INVISIBLE
+                button.isEnabled = true
+                button.text = funName
+                Toast.makeText(requireContext(), "$funName ${states.msg}!", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            is GetSmsOtpState.GetSmsOtpLoading -> {
+                binding.progress.visibility = View.VISIBLE
+                button.isEnabled = false
+            }
+            is GetSmsOtpState.GetSmsOtpWaiting -> {
+                binding.progress.visibility = View.INVISIBLE
+                button.isEnabled = false
+                button.text = "$funName (Wait ${states.secs} secs)"
+            }
+            is GetSmsOtpState.GetSmsOtpSuccess -> {
+                binding.progress.visibility = View.INVISIBLE
+                button.isEnabled = false
+                Toast.makeText(requireContext(), "$funName success!", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    @Suppress("SameParameterValue")
+    @SuppressLint("SetTextI18n")
+    private fun updateButton(button: Button, funName: String, secs: Long, countdownSec: Long) {
+        when {
+            secs == 0L -> {
+                button.isEnabled = true
+                button.text = funName
+            }
+            secs > countdownSec -> {
+                button.isEnabled = true
+                button.text = funName
+                Toast.makeText(requireContext(), "$funName fail!", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                button.text = "$funName (Wait $secs secs)"
+                if (secs == countdownSec) {
+                    Toast.makeText(requireContext(), "$funName success!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
+
     private fun onClickGetOTP() {
         binding.progress.visibility = View.VISIBLE
         binding.btnGetOTP.isEnabled = false
 
-        val countdownSec = 10L
+        val countdownSec = COUNTDOWN_SECS
         disposable = viewModel.getSmsOTP(countdownSec)
             .subscribe {
                 binding.progress.visibility = View.INVISIBLE
                 val secs = countdownSec - it
-                when {
-                    secs == 0L -> {
-                        binding.btnGetOTP.isEnabled = true
-                        binding.btnGetOTP.text = "get SMS OTP"
-                    }
-                    secs > countdownSec -> {
-                        binding.btnGetOTP.isEnabled = true
-                        binding.btnGetOTP.text = "get SMS OTP"
-                        Toast.makeText(requireContext(), "Get OTP fail!", Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {
-                        binding.btnGetOTP.text = "get SMS OTP (Wait $secs secs)"
-                        if (secs == countdownSec) {
-                            Toast.makeText(requireContext(), "Get OTP success!", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-                }
+                updateButton(binding.btnGetOTP, "Get SMS OTP", secs, countdownSec)
             }
     }
 
-    @SuppressLint("SetTextI18n")
     private fun onClickGetOTP2() {
         binding.progress.visibility = View.VISIBLE
         binding.btnGetOTP2.isEnabled = false
 
-        val countdownSec = 10L
+        val countdownSec = COUNTDOWN_SECS
         lifecycleScope.launch {
             viewModel.getSmsOTP2(countdownSec)
                 .collect {
                     binding.progress.visibility = View.INVISIBLE
                     val secs = it
-                    when {
-                        secs == 0L -> {
-                            binding.btnGetOTP2.isEnabled = true
-                            binding.btnGetOTP2.text = "get SMS OTP2"
-                        }
-                        secs < 0L -> {
-                            binding.btnGetOTP2.isEnabled = true
-                            binding.btnGetOTP2.text = "get SMS OTP2"
-                            Toast.makeText(requireContext(), "Get OTP2 fail!", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                        else -> {
-                            binding.btnGetOTP2.text = "get SMS OTP2 (Wait $secs secs)"
-                            if (secs == countdownSec) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Get OTP2 success!",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-                        }
-                    }
+                    updateButton(binding.btnGetOTP2, "Get SMS OTP2", secs, countdownSec)
                 }
         }
+    }
+
+    private fun onClickGetOTP3() {
+        viewModel.getSmsOTP3(COUNTDOWN_SECS)
     }
 }
