@@ -27,7 +27,7 @@ An Android example App that simulates "get SMS OTP" flow:
  - [RxJava2 and LiveData](https://ithelp.ithome.com.tw/articles/10197420)
  - [Sealed interfaces in Kotlin](https://jorgecastillo.dev/sealed-interfaces-kotlin)
  - [Kotlin flows on Android](https://developer.android.com/kotlin/flow)
-
+ - [StateFlow and SharedFlow](https://developer.android.com/kotlin/flow/stateflow-and-sharedflow)
 
  ## Libraries
 
@@ -40,4 +40,4 @@ An Android example App that simulates "get SMS OTP" flow:
 
  ## Todos
 
- - update UI by Coroutines StateFlow.
+ - update UI by RxJava BehaviorSubject.

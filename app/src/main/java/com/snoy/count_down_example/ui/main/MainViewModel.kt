@@ -12,10 +12,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -28,6 +25,10 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
     }
     val getSmsOtp4State: MutableLiveData<GetSmsOtpState> by lazy {
         MutableLiveData(GetSmsOtpState.GetSmsOtpInitial)
+    }
+
+    val getSmsOtp5State: MutableStateFlow<GetSmsOtpState> by lazy {
+        MutableStateFlow(GetSmsOtpState.GetSmsOtpInitial)
     }
 
     //RxJava
@@ -136,6 +137,27 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
                         })
                     } else {
                         getSmsOtp4State.value = GetSmsOtpState.GetSmsOtpFail("FAIL")
+                    }
+                }
+        }
+    }
+
+    //Flow to StateFlow
+    fun getSmsOTP5(countdownSecs: Long) {
+        getSmsOtp5State.value = GetSmsOtpState.GetSmsOtpLoading
+
+        viewModelScope.launch {
+            repo.getSmsOtp2()
+                .flowOn(Dispatchers.IO) // Works upstream, doesn't change downstream
+                .flowOn(Dispatchers.Main)
+                .collect { success ->
+                    return@collect if (success) {
+                        getSmsOtp5State.value = GetSmsOtpState.GetSmsOtpSuccess
+                        getSmsOtpDelay3(countdownSecs, callback = { secs ->
+                            getSmsOtp5State.value = secsToSmsOtpState(secs)
+                        })
+                    } else {
+                        getSmsOtp5State.value = GetSmsOtpState.GetSmsOtpFail("FAIL")
                     }
                 }
         }

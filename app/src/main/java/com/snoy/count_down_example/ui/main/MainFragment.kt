@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.snoy.count_down_example.R
 import com.snoy.count_down_example.databinding.MainFragmentBinding
 import com.snoy.count_down_example.model.repo.FakeAuthRepo
@@ -63,6 +65,17 @@ class MainFragment : Fragment() {
             updateButton(binding.btnGetOTP4, getString(R.string.get_sms_otp4), state)
         }
         binding.btnGetOTP4.setOnClickListener { viewModel.getSmsOTP4(COUNTDOWN_SECS) }
+
+        lifecycleScope.launch {
+            // repeatOnLifecycle launches the block in a new coroutine every time the
+            // lifecycle is in the STARTED state (or above) and cancels it when it's STOPPED.
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getSmsOtp5State.collect { state ->
+                    updateButton(binding.btnGetOTP5, getString(R.string.get_sms_otp5), state)
+                }
+            }
+        }
+        binding.btnGetOTP5.setOnClickListener { viewModel.getSmsOTP5(COUNTDOWN_SECS) }
     }
 
     @Suppress("SameParameterValue")
@@ -107,7 +120,7 @@ class MainFragment : Fragment() {
                 button.isEnabled = true
                 button.text = funName
             }
-            secs > countdownSec -> {
+            secs > countdownSec || secs < 0 -> {
                 button.isEnabled = true
                 button.text = funName
                 Toast.makeText(requireContext(), "$funName fail!", Toast.LENGTH_SHORT).show()
