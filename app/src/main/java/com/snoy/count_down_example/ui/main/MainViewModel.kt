@@ -148,18 +148,19 @@ class MainViewModel(private val repo: AuthRepo) : ViewModel() {
 
         viewModelScope.launch {
             repo.getSmsOtp2()
-                .flowOn(Dispatchers.IO) // Works upstream, doesn't change downstream
-                .flowOn(Dispatchers.Main)
-                .collect { success ->
-                    return@collect if (success) {
+                .map { success ->
+                    if (success) {
                         getSmsOtp5State.value = GetSmsOtpState.GetSmsOtpSuccess
-                        getSmsOtpDelay3(countdownSecs, callback = { secs ->
+                        getSmsOtpDelay2(countdownSecs).collect { secs ->
                             getSmsOtp5State.value = secsToSmsOtpState(secs)
-                        })
+                        }
                     } else {
                         getSmsOtp5State.value = GetSmsOtpState.GetSmsOtpFail("FAIL")
                     }
                 }
+                .flowOn(Dispatchers.IO) // Works upstream, doesn't change downstream
+                .flowOn(Dispatchers.Main)
+                .collect()
         }
     }
 }
