@@ -3,7 +3,7 @@
 An Android example App that simulates "get SMS OTP" flow:
  - click the "get SMS OTP" button
  - disable the button and show progressbar while waiting for response
- - count down frm 10 to 0
+ - count down from 10 to 0
  - the button can be clicked again
 
 ## Dev env
